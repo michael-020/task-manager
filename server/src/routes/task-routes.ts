@@ -1,21 +1,19 @@
 import { Router } from "express"
+import {
+  createTask,
+  getTasks,
+  updateTask,
+  deleteTask,
+} from "../controllers/task-controller"
+import { authMiddleware } from "../middleware/auth-middleware"
 
 const router = Router()
 
-router.post("/", (req, res) => {
-  res.send("Create task")
-})
+router.use(authMiddleware)
 
-router.get("/", (req, res) => {
-  res.send("Get all tasks")
-})
-
-router.put("/:id", (req, res) => {
-  res.send("Update task")
-})
-
-router.delete("/:id", (req, res) => {
-  res.send("Delete task")
-})
+router.post("/", createTask)
+router.get("/", getTasks)
+router.put("/:id", updateTask)
+router.delete("/:id", deleteTask)
 
 export default router
