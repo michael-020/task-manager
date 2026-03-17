@@ -1,5 +1,7 @@
 import { create } from "zustand"
 import { axiosInstance } from '../lib/axios'
+import { AxiosError } from 'axios'
+import toast from 'react-hot-toast'
 
 interface User {
   _id: string
@@ -38,8 +40,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: res.data.user,
         isAuthenticated: true,
       })
+      toast.success("Account created Successfully")
     } catch (error: any) {
       console.error(error.response?.data?.message || "Signup failed")
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       set({ signupLoading: false })
     }
@@ -55,8 +63,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: res.data.user,
         isAuthenticated: true,
       })
+      toast.success("Signed In Successfully")
     } catch (error: any) {
       console.error(error.response?.data?.message || "Signin failed")
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       set({ signinLoading: false })
     }

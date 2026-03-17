@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
+import { useTaskStore } from '../store/taskStore'
+import { X } from "lucide-react"
 
 interface Props {
   onClose: () => void
@@ -23,6 +25,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
   const [dueDate, setDueDate] = useState(
     initialData?.dueDate ? initialData.dueDate.slice(0, 10) : ""
   )
+  const { createLoading, updateLoading } = useTaskStore()
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -49,9 +52,17 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
       <form
         ref={ref}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md w-96 flex flex-col gap-3"
+        className="bg-white p-6 rounded-xl shadow-md w-96 flex flex-col gap-3 relative"
       >
-        <h2 className="text-lg font-semibold">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-black"
+        >
+          <X size={22} />
+        </button>
+
+        <h2 className="text-lg font-semibold pt-2">
           {initialData ? "Update Task" : "Create Task"}
         </h2>
 
@@ -78,8 +89,17 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
           className="border p-2 rounded"
         />
 
-        <button className="bg-black text-white p-2 rounded">
-          {initialData ? "Update" : "Create"}
+        <button
+          disabled={createLoading || updateLoading}
+          className="bg-black text-white p-2 rounded"
+        >
+          {initialData
+            ? updateLoading
+              ? "Updating..."
+              : "Update"
+            : createLoading
+              ? "Creating..."
+              : "Create"}
         </button>
       </form>
     </div>,

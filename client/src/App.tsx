@@ -6,9 +6,10 @@ import Signin from "./components/signin"
 import Signup from "./components/signup"
 import Home from "./components/home"
 import { Loader2 } from 'lucide-react'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
-  const { user, isAuthenticated, checkAuth, checkAuthLoading } = useAuthStore()
+  const { isAuthenticated, checkAuth, checkAuthLoading } = useAuthStore()
 
   useEffect(() => {
     checkAuth()
@@ -23,28 +24,31 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-    <Routes>
-      <Route
-        path="/signup"
-        element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />}
-      />
-
-      <Route
-        path="/signin"
-        element={!isAuthenticated ? <Signin /> : <Navigate to="/home" />}
-      />
-
-      <Route
-        path="/home"
-        element={isAuthenticated ? <Home /> : <Navigate to="/signin" />}
-      />
-
-      <Route
-        path="*"
-        element={<Navigate to={isAuthenticated ? "/home" : "/signin"} />}
-      />
-    </Routes>
-    </BrowserRouter>
+    <div>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/signup"
+            element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />}
+          />
+    
+          <Route
+            path="/signin"
+            element={!isAuthenticated ? <Signin /> : <Navigate to="/home" />}
+          />
+    
+          <Route
+            path="/home"
+            element={isAuthenticated ? <Home /> : <Navigate to="/signin" />}
+          />
+    
+          <Route
+            path="*"
+            element={<Navigate to={isAuthenticated ? "/home" : "/signin"} />}
+          />
+        </Routes>
+      </BrowserRouter>
+      <Toaster />
+    </div>
   )
 }

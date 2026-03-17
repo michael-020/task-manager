@@ -1,5 +1,7 @@
 import { create } from "zustand"
 import { axiosInstance } from "../lib/axios"
+import { AxiosError } from 'axios'
+import toast from 'react-hot-toast'
 
 interface Task {
   _id: string
@@ -53,6 +55,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       set({ createLoading: true })
       await axiosInstance.post("/task", data)
       await get().fetchTasks(1)
+      toast.success("Task Created")
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       set({ createLoading: false })
     }
@@ -72,6 +81,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       set({ deleteLoading: true })
       await axiosInstance.delete(`/task/${id}`)
       await get().fetchTasks(get().currentPage)
+      toast.success("Task Deleted")
+    } catch (error) { 
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       set({ deleteLoading: false })
     }
@@ -86,6 +102,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
           t._id === id ? res.data : t
         ),
       })
+      toast.success("Task Updated")
+    } catch (error) { 
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       set({ updateLoading: false })
     }

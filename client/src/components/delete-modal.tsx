@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
+import { useTaskStore } from '../store/taskStore'
 
 interface Props {
   onClose: () => void
@@ -8,6 +9,7 @@ interface Props {
 
 export default function DeleteModal({ onClose, onConfirm }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const { deleteLoading } = useTaskStore()
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,10 +36,11 @@ export default function DeleteModal({ onClose, onConfirm }: Props) {
             Cancel
           </button>
           <button
+            disabled={deleteLoading}
             onClick={onConfirm}
             className="px-4 py-2 bg-red-500 text-white rounded"
           >
-            Delete
+            {deleteLoading ? "Deleting..." : "Delete"}
           </button>
         </div>
       </div>

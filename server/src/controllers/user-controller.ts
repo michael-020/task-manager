@@ -9,7 +9,11 @@ export const signup = async (req: Request, res: Response) => {
     const parsed = signupSchema.safeParse(req.body)
     
     if (!parsed.success) {
-      res.status(400).json({ message: "Invalid Inputs" })
+      const parsedMessage = JSON.parse(parsed.error.message)
+      
+      const firstMessage = parsedMessage[0]?.message
+    
+      res.status(400).json({ message: firstMessage })
       return
     }
 
@@ -48,7 +52,11 @@ export const signin = async (req: Request, res: Response) => {
     const parsed = signinSchema.safeParse(req.body)
 
     if (!parsed.success) {
-      res.status(400).json({ message: "Invalid Inputs" })
+      const parsedMessage = JSON.parse(parsed.error.message)
+      
+      const firstMessage = parsedMessage[0]?.message
+    
+      res.status(400).json({ message: firstMessage })
       return
     }
 
