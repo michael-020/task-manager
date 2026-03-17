@@ -7,16 +7,18 @@ import { generateToken } from '../utils/generateToken'
 export const signup = async (req: Request, res: Response) => {
   try {
     const parsed = signupSchema.safeParse(req.body)
-
+    
     if (!parsed.success) {
-      return res.status(400).json({ message: "Invalid Inputs" })
+      res.status(400).json({ message: "Invalid Inputs" })
+      return
     }
 
     const { name, email, password } = parsed.data
 
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" })
+      res.status(400).json({ message: "User already exists" })
+      return
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -46,19 +48,22 @@ export const signin = async (req: Request, res: Response) => {
     const parsed = signinSchema.safeParse(req.body)
 
     if (!parsed.success) {
-      return res.status(400).json({ message: "Invalid Inputs" })
+      res.status(400).json({ message: "Invalid Inputs" })
+      return
     }
 
     const { email, password } = parsed.data
 
     const user = await User.findOne({ email })
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" })
+      res.status(400).json({ message: "Invalid credentials" })
+      return
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" })
+      res.status(400).json({ message: "Invalid credentials" })
+      return
     }
 
     generateToken(user._id, res)

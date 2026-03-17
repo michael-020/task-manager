@@ -10,6 +10,7 @@ export const createTask = async (req: Request, res: Response) => {
     const parsed = createTaskSchema.safeParse(req.body)
 
     if (!parsed.success) {
+      console.log("error: ", parsed.error)
       return res.status(400).json({ message: "Invalid Inputs" })
     }
 
@@ -19,7 +20,7 @@ export const createTask = async (req: Request, res: Response) => {
       user: req.user?._id,
       title,
       description,
-      dueDate,
+      dueDate: dueDate ? new Date(dueDate) : undefined,
     })
 
     res.status(201).json(task)
@@ -59,7 +60,7 @@ export const updateTask = async (req: Request, res: Response) => {
     const task = await Task.findOneAndUpdate(
       { _id: id, user: req.user?._id },
       parsed.data,
-      { new: true }
+      { returnDocument: 'after' }
     )
 
     if (!task) {
