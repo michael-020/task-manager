@@ -1,17 +1,22 @@
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import { signupSchema, signinSchema } from "../validators/user-validator"
 import User from "../models/User"
 import { generateToken } from '../utils/generateToken'
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
+    const parsed = signupSchema.safeParse(req.body)
+
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid Inputs" })
+    }
+
+    const { name, email, password } = parsed.data
 
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-      res.status(400).json({ message: "User already exists" })
-      return
+      return res.status(400).json({ message: "User already exists" })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -21,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
     })
-    
+
     generateToken(user._id, res)
 
     res.status(200).json({
@@ -38,18 +43,22 @@ export const signup = async (req: Request, res: Response) => {
 
 export const signin = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const parsed = signinSchema.safeParse(req.body)
+
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid Inputs" })
+    }
+
+    const { email, password } = parsed.data
 
     const user = await User.findOne({ email })
     if (!user) {
-      res.status(400).json({ message: "Invalid credentials" })
-      return
+      return res.status(400).json({ message: "Invalid credentials" })
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-      res.status(400).json({ message: "Invalid credentials" })
-      return
+      return res.status(400).json({ message: "Invalid credentials" })
     }
 
     generateToken(user._id, res)
