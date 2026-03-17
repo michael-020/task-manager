@@ -5,38 +5,57 @@ interface Task {
   _id: string
   title: string
   description: string
-  status: "pending" | "completed",
+  status: "pending" | "completed"
   dueDate?: string
 }
 
 interface TaskState {
   tasks: Task[]
   loading: boolean
+  createLoading: boolean
+  updateLoading: boolean
+  deleteLoading: boolean
+  totalPages: number
+  currentPage: number
 
-  fetchTasks: () => Promise<void>
-  createTask: (data: { title: string; description: string }) => Promise<void>
+  fetchTasks: (page?: number) => Promise<void>
+  createTask: (data: { title: string; description: string; dueDate?: string }) => Promise<void>
   toggleTask: (id: string, status: "pending" | "completed") => Promise<void>
   deleteTask: (id: string) => Promise<void>
-  updateTask: (id: string, data: { title: string, description: string, dueDate?: string }) => void;
+  updateTask: (id: string, data: { title: string; description: string; dueDate?: string }) => Promise<void>
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
   tasks: [],
   loading: false,
+  createLoading: false,
+  updateLoading: false,
+  deleteLoading: false,
+  totalPages: 0,
+  currentPage: 1,
 
-  fetchTasks: async () => {
+  fetchTasks: async (page = 1) => {
     try {
       set({ loading: true })
-      const res = await axiosInstance.get("/task")
-      set({ tasks: res.data })
+      const res = await axiosInstance.get(`/task?page=${page}&limit=5`)
+      set({
+        tasks: res.data.tasks,
+        totalPages: res.data.totalPages,
+        currentPage: res.data.page,
+      })
     } finally {
       set({ loading: false })
     }
   },
 
   createTask: async (data) => {
-    const res = await axiosInstance.post("/task", data)
-    set({ tasks: [res.data, ...get().tasks] })
+    try {
+      set({ createLoading: true })
+      await axiosInstance.post("/task", data)
+      await get().fetchTasks(1)
+    } finally {
+      set({ createLoading: false })
+    }
   },
 
   toggleTask: async (id, status) => {
@@ -49,20 +68,26 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   deleteTask: async (id) => {
-    await axiosInstance.delete(`/task/${id}`)
-    set({
-      tasks: get().tasks.filter((t) => t._id !== id),
-    })
+    try {
+      set({ deleteLoading: true })
+      await axiosInstance.delete(`/task/${id}`)
+      await get().fetchTasks(get().currentPage)
+    } finally {
+      set({ deleteLoading: false })
+    }
   },
-  
+
   updateTask: async (id, data) => {
-    const res = await axiosInstance.put(`/task/${id}`, data)
-  
-    set({
-      tasks: get().tasks.map((t) =>
-        t._id === id ? res.data : t
-      ),
-    })
+    try {
+      set({ updateLoading: true })
+      const res = await axiosInstance.put(`/task/${id}`, data)
+      set({
+        tasks: get().tasks.map((t) =>
+          t._id === id ? res.data : t
+        ),
+      })
+    } finally {
+      set({ updateLoading: false })
+    }
   },
-  
 }))

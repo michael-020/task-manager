@@ -31,17 +31,24 @@ export const createTask = async (req: Request, res: Response) => {
 
 export const getTasks = async (req: Request, res: Response) => {
   try {
-    const { status } = req.query
-
-    const filter: any = { user: req.user?._id }
-
-    if (status && (status === "pending" || status === "completed")) {
-      filter.status = status
-    }
-
-    const tasks = await Task.find(filter).sort({ createdAt: -1 })
-
-    res.json(tasks)
+    const page = parseInt(req.query.page as string) || 1
+      const limit = parseInt(req.query.limit as string) || 5
+    
+      const skip = (page - 1) * limit
+    
+      const tasks = await Task.find({ user: req.user?._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+    
+      const total = await Task.countDocuments({ user: req.user?._id })
+    
+      res.json({
+        tasks,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      })
   } catch (error) {
     res.status(500).json({ message: "Server error" })
   }
