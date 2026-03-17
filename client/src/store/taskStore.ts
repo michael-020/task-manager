@@ -4,7 +4,7 @@ import { axiosInstance } from "../lib/axios"
 interface Task {
   _id: string
   title: string
-  description?: string
+  description: string
   status: "pending" | "completed",
   dueDate?: string
 }
@@ -14,9 +14,10 @@ interface TaskState {
   loading: boolean
 
   fetchTasks: () => Promise<void>
-  createTask: (data: { title: string; description?: string }) => Promise<void>
+  createTask: (data: { title: string; description: string }) => Promise<void>
   toggleTask: (id: string, status: "pending" | "completed") => Promise<void>
   deleteTask: (id: string) => Promise<void>
+  updateTask: (id: string, data: { title: string, description: string, dueDate?: string }) => void;
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
@@ -53,4 +54,15 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       tasks: get().tasks.filter((t) => t._id !== id),
     })
   },
+  
+  updateTask: async (id, data) => {
+    const res = await axiosInstance.put(`/task/${id}`, data)
+  
+    set({
+      tasks: get().tasks.map((t) =>
+        t._id === id ? res.data : t
+      ),
+    })
+  },
+  
 }))

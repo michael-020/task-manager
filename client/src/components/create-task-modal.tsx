@@ -5,17 +5,24 @@ interface Props {
   onClose: () => void
   onSubmit: (data: {
     title: string
-    description?: string
+    description: string
     dueDate?: string
   }) => void
+  initialData?: {
+    title: string
+    description?: string
+    dueDate?: string
+  }
 }
 
-export default function CreateTaskModal({ onClose, onSubmit }: Props) {
+export default function CreateTaskModal({ onClose, onSubmit, initialData }: Props) {
   const ref = useRef<HTMLFormElement>(null)
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [dueDate, setDueDate] = useState("")
+  const [title, setTitle] = useState(initialData?.title || "")
+  const [description, setDescription] = useState(initialData?.description || "")
+  const [dueDate, setDueDate] = useState(
+    initialData?.dueDate ? initialData.dueDate.slice(0, 10) : ""
+  )
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -29,7 +36,11 @@ export default function CreateTaskModal({ onClose, onSubmit }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({ title, description, dueDate: dueDate ? dueDate : undefined })
+    onSubmit({
+      title,
+      description,
+      dueDate: dueDate ? dueDate : undefined,
+    })
     onClose()
   }
 
@@ -40,23 +51,26 @@ export default function CreateTaskModal({ onClose, onSubmit }: Props) {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-xl shadow-md w-96 flex flex-col gap-3"
       >
-        <h2 className="text-lg font-semibold">Create Task</h2>
+        <h2 className="text-lg font-semibold">
+          {initialData ? "Update Task" : "Create Task"}
+        </h2>
 
+        <label className="text-sm">Title</label>
         <input
-          placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="border p-2 rounded"
           required
         />
 
+        <label className="text-sm">Description</label>
         <input
-          placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="border p-2 rounded"
         />
 
+        <label className="text-sm">Due Date (optional)</label>
         <input
           type="date"
           value={dueDate}
@@ -65,7 +79,7 @@ export default function CreateTaskModal({ onClose, onSubmit }: Props) {
         />
 
         <button className="bg-black text-white p-2 rounded">
-          Create
+          {initialData ? "Update" : "Create"}
         </button>
       </form>
     </div>,
