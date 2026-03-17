@@ -13,15 +13,24 @@ export default function Home() {
   const [showCreate, setShowCreate] = useState(false)
   const [editTask, setEditTask] = useState<any>(null)
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all")
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     fetchTasks()
   }, [])
 
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === "all") return true
-    return task.status === filter
-  })
+  const filteredTasks = tasks
+    .filter((task) => {
+      if (filter === "all") return true
+      return task.status === filter
+    })
+    .filter((task) => {
+      if (!search.trim()) return true
+      return (
+        task.title.toLowerCase().includes(search.toLowerCase()) ||
+        task.description?.toLowerCase().includes(search.toLowerCase())
+      )
+    })
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -39,6 +48,13 @@ export default function Home() {
           </button>
         </div>
 
+        <input
+          placeholder="Search tasks..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full mb-4 p-3 border rounded-lg text-sm"
+        />
+
         <div className="flex gap-2 mb-6">
           {["all", "pending", "completed"].map((type) => (
             <button
@@ -54,6 +70,16 @@ export default function Home() {
             </button>
           ))}
         </div>
+
+        {filteredTasks.length === 0 && (
+          <div className="text-center text-gray-500 mt-10 text-sm">
+            {tasks.length === 0
+              ? "No tasks yet. Create your first task."
+              : search.trim()
+              ? "No tasks match your search."
+              : `No ${filter} tasks found.`}
+          </div>
+        )}
 
         <div className="flex flex-col gap-3">
           {filteredTasks.map((task) => (
