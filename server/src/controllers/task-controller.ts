@@ -25,7 +25,7 @@ export const createTask = async (req: Request, res: Response) => {
 
     res.status(201).json(task)
   } catch (error) {
-    res.status(500).json({ message: "Server error" })
+    res.status(500).json({ message: "Internal Server error" })
   }
 }
 
@@ -50,7 +50,7 @@ export const getTasks = async (req: Request, res: Response) => {
         totalPages: Math.ceil(total / limit),
       })
   } catch (error) {
-    res.status(500).json({ message: "Server error" })
+    res.status(500).json({ message: "Internal Server error" })
   }
 }
 
@@ -76,7 +76,7 @@ export const updateTask = async (req: Request, res: Response) => {
 
     res.json(task)
   } catch (error) {
-    res.status(500).json({ message: "Server error" })
+    res.status(500).json({ message: "Internal Server error" })
   }
 }
 
@@ -95,6 +95,6 @@ export const deleteTask = async (req: Request, res: Response) => {
 
     res.json({ message: "Task deleted" })
   } catch (error) {
-    res.status(500).json({ message: "Server error" })
+    res.status(500).json({ message: "Internal Server error" })
   }
 }

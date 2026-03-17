@@ -7,6 +7,7 @@ import Signup from "./components/signup"
 import Home from "./components/home"
 import { Loader2 } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
+import LandingPage from './components/landing-page'
 
 export default function App() {
   const { isAuthenticated, checkAuth, checkAuthLoading } = useAuthStore()
@@ -45,6 +46,11 @@ export default function App() {
           <Route
             path="*"
             element={<Navigate to={isAuthenticated ? "/home" : "/signin"} />}
+          />
+          
+          <Route
+            path="/"
+            element={<LandingPage />}
           />
         </Routes>
       </BrowserRouter>

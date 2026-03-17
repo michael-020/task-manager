@@ -9,5 +9,6 @@ router.post("/signup", signup)
 router.post("/signin", signin)
 
 router.get("/check", authMiddleware, checkAuth)
+router.get("/logout", authMiddleware, checkAuth)
 
 export default router

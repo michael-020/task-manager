@@ -16,10 +16,12 @@ interface AuthState {
   signupLoading: boolean
   signinLoading: boolean
   checkAuthLoading: boolean
+  logoutLoading: boolean
 
   signup: (data: { name: string; email: string; password: string }) => Promise<void>
   signin: (data: { email: string; password: string }) => Promise<void>
   checkAuth: () => Promise<void>
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -29,6 +31,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signupLoading: false,
   signinLoading: false,
   checkAuthLoading: false,
+  logoutLoading: false,
 
   signup: async (data) => {
     try {
@@ -95,4 +98,26 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ checkAuthLoading: false })
     }
   },
+  
+  logout: async () => {
+    try {
+      set({ logoutLoading: true })
+
+      await axiosInstance.get("/user/logout")
+
+      set({
+        user: null,
+        isAuthenticated: false,
+      })
+      toast.success("Logged out successfully")
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        toast.error(error.response.data.message as string);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      set({ logoutLoading: false })
+    }
+  }
 }))
