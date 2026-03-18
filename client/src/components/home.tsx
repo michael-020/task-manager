@@ -20,7 +20,7 @@ export default function Home() {
     createLoading,
     totalTasks,
     completedTasks,
-    pendingTasks 
+    pendingTasks,
   } = useTaskStore()
 
   const { user, logout, logoutLoading } = useAuthStore()
@@ -52,6 +52,11 @@ export default function Home() {
     await createTask(data)
     setShowCreate(false)
   }
+
+  const filteredTotal =
+    filter === "all" ? totalTasks : filter === "completed" ? completedTasks : pendingTasks
+
+  const showPagination = !search.trim() && filteredTotal > 5 && totalPages > 1
 
   return (
     <div className="min-h-screen bg-neutral-100">
@@ -213,7 +218,7 @@ export default function Home() {
               ))}
             </div>
 
-            {totalPages > 1 && filteredTasks.length > 0 && (
+            {showPagination && filteredTasks.length > 0 && (
               <div className="flex justify-center items-center gap-3 mt-6">
                 <button
                   disabled={currentPage === 1}
