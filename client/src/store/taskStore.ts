@@ -23,7 +23,7 @@ interface TaskState {
   completedTasks: number,
   pendingTasks: number,
 
-  fetchTasks: (page?: number) => Promise<void>
+  fetchTasks: (page?: number, filter?: string, search?: string) => Promise<void>
   createTask: (data: { title: string; description: string; dueDate?: string }) => Promise<void>
   toggleTask: (id: string, status: "pending" | "completed") => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -42,11 +42,17 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   completedTasks: 0,
   pendingTasks: 0,
 
-  fetchTasks: async (page = 1) => {
+  fetchTasks: async (page = 1, filter = "all", search = "") => {
     try {
       set({ loading: true })
-      const res = await axiosInstance.get(`/task?page=${page}&limit=5`)
-
+  
+      const params = new URLSearchParams()
+      params.set("page", String(page))
+      params.set("limit", "5")
+      if (filter && filter !== "all") params.set("status", filter)
+      if (search.trim()) params.set("search", search.trim())
+  
+      const res = await axiosInstance.get(`/task?${params.toString()}`)
       set({
         tasks: res.data.tasks,
         totalPages: res.data.totalPages,

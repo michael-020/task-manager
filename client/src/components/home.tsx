@@ -30,23 +30,22 @@ export default function Home() {
   const [editTask, setEditTask] = useState<any>(null)
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all")
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
 
   useEffect(() => {
     fetchTasks(1)
   }, [])
 
-  const filteredTasks = tasks
-    .filter((task) => {
-      if (filter === "all") return true
-      return task.status === filter
-    })
-    .filter((task) => {
-      if (!search.trim()) return true
-      return (
-        task.title.toLowerCase().includes(search.toLowerCase()) ||
-        task.description?.toLowerCase().includes(search.toLowerCase())
-      )
-    })
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 400)
+    return () => clearTimeout(timeout)
+  }, [search])
+
+  useEffect(() => {
+    fetchTasks(1, filter, debouncedSearch)
+  }, [filter, debouncedSearch])
 
   const handleCreate = async (data: any) => {
     await createTask(data)
@@ -56,7 +55,7 @@ export default function Home() {
   const filteredTotal =
     filter === "all" ? totalTasks : filter === "completed" ? completedTasks : pendingTasks
 
-  const showPagination = !search.trim() && filteredTotal > 5 && totalPages > 1
+  const showPagination = filteredTotal > 5 && totalPages > 1
 
   return (
     <div className="min-h-screen bg-neutral-100">
@@ -136,18 +135,18 @@ export default function Home() {
           <TaskSkeleton />
         ) : (
           <>
-            {filteredTasks.length === 0 && (
+            {tasks.length === 0 && (
               <div className="text-center text-neutral-400 text-sm py-16">
-                {tasks.length === 0
+                {totalTasks === 0
                   ? "No tasks yet — create your first one."
-                  : search.trim()
+                  : debouncedSearch.trim()
                   ? "No tasks match your search."
                   : `No ${filter} tasks.`}
               </div>
             )}
 
             <div className="flex flex-col gap-2">
-              {filteredTasks.map((task) => (
+              {tasks.map((task) => (
                 <div
                   key={task._id}
                   className={`bg-white border border-neutral-200 rounded-xl px-4 py-3 flex justify-between items-center gap-3 transition-opacity ${
@@ -218,11 +217,11 @@ export default function Home() {
               ))}
             </div>
 
-            {showPagination && filteredTasks.length > 0 && (
+            {showPagination && tasks.length > 0 && (
               <div className="flex justify-center items-center gap-3 mt-6">
                 <button
                   disabled={currentPage === 1}
-                  onClick={() => fetchTasks(currentPage - 1)}
+                  onClick={() => fetchTasks(currentPage - 1, filter, debouncedSearch)}
                   className="px-3 py-1.5 text-sm border border-neutral-200 rounded-lg bg-white disabled:opacity-40 hover:bg-neutral-50 transition-colors"
                 >
                   Prev
@@ -230,7 +229,7 @@ export default function Home() {
                 <span className="text-sm text-neutral-400">{currentPage} / {totalPages}</span>
                 <button
                   disabled={currentPage === totalPages}
-                  onClick={() => fetchTasks(currentPage + 1)}
+                  onClick={() => fetchTasks(currentPage + 1, filter, debouncedSearch)}
                   className="px-3 py-1.5 text-sm border border-neutral-200 rounded-lg bg-white disabled:opacity-40 hover:bg-neutral-50 transition-colors"
                 >
                   Next

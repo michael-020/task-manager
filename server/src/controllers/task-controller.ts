@@ -32,33 +32,42 @@ export const createTask = async (req: Request, res: Response) => {
 export const getTasks = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1
-      const limit = parseInt(req.query.limit as string) || 5
-    
-      const skip = (page - 1) * limit
-    
-      const tasks = await Task.find({ user: req.user?._id })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-    
-      const totalTasks = await Task.countDocuments({ user: req.user?._id })
-      const completedTasks = await Task.countDocuments({
-        user: req.user?._id,
-        status: "completed",
-      })
-      const pendingTasks = await Task.countDocuments({
-        user: req.user?._id,
-        status: "pending",
-      })
-  
-      res.json({
-        tasks,
-        page,
-        totalPages: Math.ceil(totalTasks / limit),
-        totalTasks,
-        completedTasks,
-        pendingTasks,
-      })
+    const limit = parseInt(req.query.limit as string) || 5
+    const skip = (page - 1) * limit
+    const status = req.query.status as string
+    const search = req.query.search as string
+
+    const baseQuery: any = { user: req.user?._id }
+
+    if (status && status !== "all") {
+      baseQuery.status = status
+    }
+
+    if (search && search.trim()) {
+      baseQuery.$or = [
+        { title: { $regex: search.trim(), $options: "i" } },
+        { description: { $regex: search.trim(), $options: "i" } },
+      ]
+    }
+
+    const tasks = await Task.find(baseQuery)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    const totalTasks = await Task.countDocuments({ user: req.user?._id })
+    const completedTasks = await Task.countDocuments({ user: req.user?._id, status: "completed" })
+    const pendingTasks = await Task.countDocuments({ user: req.user?._id, status: "pending" })
+    const filteredTotal = await Task.countDocuments(baseQuery)
+
+    res.json({
+      tasks,
+      page,
+      totalPages: Math.ceil(filteredTotal / limit),
+      totalTasks,
+      completedTasks,
+      pendingTasks,
+    })
   } catch (error) {
     res.status(500).json({ message: "Internal Server error" })
   }
