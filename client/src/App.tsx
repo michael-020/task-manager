@@ -14,7 +14,7 @@ export default function App() {
 
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
   if (checkAuthLoading) {
     return (

@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signupLoading: false,
   signinLoading: false,
-  checkAuthLoading: false,
+  checkAuthLoading: true,
   logoutLoading: false,
 
   signup: async (data) => {
@@ -107,7 +107,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({
         user: null,
-        isAuthenticated: false,
+        isAuthenticated: false
       })
       toast.success("Logged out successfully")
     } catch (error) {
