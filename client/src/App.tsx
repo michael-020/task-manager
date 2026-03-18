@@ -40,12 +40,12 @@ export default function App() {
     
           <Route
             path="/home"
-            element={isAuthenticated ? <Home /> : <Navigate to="/signin" />}
+            element={isAuthenticated ? <Home /> : <Navigate to="/" />}
           />
     
           <Route
             path="*"
-            element={<Navigate to={isAuthenticated ? "/home" : "/signin"} />}
+            element={<Navigate to={isAuthenticated ? "/home" : "/"} />}
           />
           
           <Route
