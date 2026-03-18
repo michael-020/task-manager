@@ -29,13 +29,16 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
+      if (createLoading || updateLoading) return
+  
       if (ref.current && !ref.current.contains(e.target as Node)) {
         onClose()
       }
     }
+  
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
-  }, [])
+  }, [createLoading, updateLoading])
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
@@ -44,7 +47,6 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
       description,
       dueDate: dueDate ? dueDate : undefined,
     })
-    onClose()
   }
 
   return createPortal(
@@ -57,6 +59,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
         <button
           type="button"
           onClick={onClose}
+          disabled={createLoading || updateLoading}
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
         >
           <X size={22} />
@@ -69,6 +72,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
         <label className="text-sm">Title</label>
         <input
           value={title}
+          disabled={createLoading || updateLoading}
           onChange={(e) => setTitle(e.target.value)}
           className="border p-2 rounded"
           required
@@ -77,6 +81,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
         <label className="text-sm">Description</label>
         <input
           value={description}
+          disabled={createLoading || updateLoading}
           onChange={(e) => setDescription(e.target.value)}
           className="border p-2 rounded"
         />
@@ -85,6 +90,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
         <input
           type="date"
           value={dueDate}
+          disabled={createLoading || updateLoading}
           onChange={(e) => setDueDate(e.target.value)}
           className="border p-2 rounded"
         />

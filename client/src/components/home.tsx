@@ -261,8 +261,8 @@ export default function Home() {
         <CreateTaskModal
           initialData={editTask}
           onClose={() => setEditTask(null)}
-          onSubmit={(data) => {
-            updateTask(editTask._id, data)
+          onSubmit={async (data) => {
+            await updateTask(editTask._id, data)
             setEditTask(null)
           }}
         />
