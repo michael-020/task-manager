@@ -19,6 +19,9 @@ interface TaskState {
   deleteLoading: boolean
   totalPages: number
   currentPage: number
+  totalTasks: number,
+  completedTasks: number,
+  pendingTasks: number,
 
   fetchTasks: (page?: number) => Promise<void>
   createTask: (data: { title: string; description: string; dueDate?: string }) => Promise<void>
@@ -35,15 +38,22 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   deleteLoading: false,
   totalPages: 0,
   currentPage: 1,
+  totalTasks: 0,
+  completedTasks: 0,
+  pendingTasks: 0,
 
   fetchTasks: async (page = 1) => {
     try {
       set({ loading: true })
       const res = await axiosInstance.get(`/task?page=${page}&limit=5`)
+
       set({
         tasks: res.data.tasks,
         totalPages: res.data.totalPages,
         currentPage: res.data.page,
+        totalTasks: res.data.totalTasks,
+        completedTasks: res.data.completedTasks,
+        pendingTasks: res.data.pendingTasks,
       })
     } finally {
       set({ loading: false })

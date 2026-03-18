@@ -41,13 +41,23 @@ export const getTasks = async (req: Request, res: Response) => {
         .skip(skip)
         .limit(limit)
     
-      const total = await Task.countDocuments({ user: req.user?._id })
-    
+      const totalTasks = await Task.countDocuments({ user: req.user?._id })
+      const completedTasks = await Task.countDocuments({
+        user: req.user?._id,
+        status: "completed",
+      })
+      const pendingTasks = await Task.countDocuments({
+        user: req.user?._id,
+        status: "pending",
+      })
+  
       res.json({
         tasks,
-        total,
         page,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(totalTasks / limit),
+        totalTasks,
+        completedTasks,
+        pendingTasks,
       })
   } catch (error) {
     res.status(500).json({ message: "Internal Server error" })

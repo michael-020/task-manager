@@ -18,6 +18,9 @@ export default function Home() {
     totalPages,
     loading,
     createLoading,
+    totalTasks,
+    completedTasks,
+    pendingTasks 
   } = useTaskStore()
 
   const { user, logout, logoutLoading } = useAuthStore()
@@ -49,10 +52,6 @@ export default function Home() {
     await createTask(data)
     setShowCreate(false)
   }
-
-  const totalTasks = tasks.length
-  const completedTasks = tasks.filter((t) => t.status === "completed").length
-  const pendingTasks = tasks.filter((t) => t.status === "pending").length
 
   return (
     <div className="min-h-screen bg-neutral-100">
