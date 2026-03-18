@@ -37,7 +37,7 @@ export default function CreateTaskModal({ onClose, onSubmit, initialData }: Prop
     return () => document.removeEventListener("mousedown", handler)
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
     onSubmit({
       title,

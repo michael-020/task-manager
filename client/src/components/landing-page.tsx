@@ -6,13 +6,13 @@ export default function LandingPage() {
         <span className="text-lg font-semibold text-[#1a1a18]">Taskly</span>
         <div className="flex gap-2 items-center">
           <a
-            href="/login"
+            href="/signin"
             className="px-4 py-2 text-sm text-[#6b6b60] rounded-lg hover:text-[#1a1a18] hover:bg-[#eae8e2]"
           >
             Log in
           </a>
           <a
-            href="/register"
+            href="/signup"
             className="px-5 py-2 text-sm bg-[#1a1a18] text-[#f5f4f0] rounded-lg hover:bg-[#2e2e2a]"
           >
             Get started
@@ -38,13 +38,13 @@ export default function LandingPage() {
 
         <div className="flex gap-3 flex-wrap justify-center mb-12">
           <a
-            href="/register"
+            href="/signup"
             className="px-8 py-3 bg-[#1a1a18] text-[#f5f4f0] rounded-xl text-sm font-medium hover:bg-[#2e2e2a] transition"
           >
             Start for free
           </a>
           <a
-            href="/login"
+            href="/signin"
             className="px-8 py-3 border border-[#d4d2ca] text-[#1a1a18] rounded-xl text-sm hover:border-[#1a1a18] hover:bg-[#eae8e2] transition"
           >
             Log in

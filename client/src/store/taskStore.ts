@@ -80,7 +80,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     try {
       set({ deleteLoading: true })
       await axiosInstance.delete(`/task/${id}`)
-      await get().fetchTasks(get().currentPage)
+      
+      const { tasks, currentPage } = get()
+
+      if (tasks.length === 1 && currentPage > 1) {
+        await get().fetchTasks(currentPage - 1)
+      } else {
+        await get().fetchTasks(currentPage)
+      }
       toast.success("Task Deleted")
     } catch (error) { 
       if (error instanceof AxiosError && error.response?.data?.message) {
